@@ -6,6 +6,10 @@ import java.math.BigDecimal;
 import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -24,6 +28,12 @@ import tw.com.firstbank.fcbcore.fcbframework.core.domain.BaseAggregate;
 @Table(name ="RefundTxn")
 public class RefundTxn extends BaseAggregate<RefundTxn, UUID> implements Serializable {
 
+
+	@Id
+//	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_id_seq")
+//	@SequenceGenerator(name = "user_id_seq", sequenceName = "ISEQ$$_225855", allocationSize = 1)
+	@Column(name = "id", nullable = false, updatable = false)
+	private Long id;
 
 
 	@Column(name = "uuid", nullable = false, updatable = false, unique = true)

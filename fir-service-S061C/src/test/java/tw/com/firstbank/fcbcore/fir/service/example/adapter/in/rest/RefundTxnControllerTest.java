@@ -36,7 +36,6 @@ public class RefundTxnControllerTest {
 	@Mock
 	private CommandBus commandBus;
 
-	//test
 	@Autowired
 	private ObjectMapper objectMapper;
 

@@ -11,6 +11,6 @@ public interface RefundTxnRepository extends AggregateRepository<RefundTxn, UUID
 	Optional<RefundTxn> get(UUID uuid);
 
 
-	RefundTxn getS061BySeqNoAndAdviceBranch(String seqNo, String adviceBranch);
+	Optional<RefundTxn> getS061BySeqNoAndAdviceBranch(String seqNo, String adviceBranch);
 
 }
