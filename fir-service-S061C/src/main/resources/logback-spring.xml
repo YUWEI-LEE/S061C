@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- 引用 Spring Boot 對 Logback 的預設配置 -->
+    <!-- 定義 CONSOLE 與 FILE 兩個 Appender -->
+    <!-- <include resource="org/springframework/boot/logging/logback/base.xml" />-->
+
+    <springProperty scope="context" name="springAppName" source="spring.application.name"/>
+    <springProperty scope="context" name="env" source="spring.profiles.active"
+                    defaultValue="default"/>
+
+    <property name="CHARSET" value="UTF-8"/>
+    <property name="PATTERN"
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %X{x-core-traceid} %-5level %logger{35} - %msg %n"/>
+
+    <!-- 設定印出 console 時的相關設定 -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="JSONOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <timestamp>
+                    <fieldName>timestamp</fieldName>
+                    <timeZone>UTC</timeZone>
+                </timestamp>
+                <loggerName>
+                    <fieldName>logger</fieldName>
+                </loggerName>
+                <logLevel>
+                    <fieldName>level</fieldName>
+                </logLevel>
+                <threadName>
+                    <fieldName>thread</fieldName>
+                </threadName>
+                <nestedField>
+                    <fieldName>mdc</fieldName>
+                    <providers>
+                        <mdc/>
+                    </providers>
+                </nestedField>
+                <stackTrace>
+                    <fieldName>stackTrace</fieldName>
+                    <!-- maxLength - limit the length of the stack trace -->
+                    <throwableConverter
+                            class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
+                        <maxDepthPerThrowable>200</maxDepthPerThrowable>
+                        <maxLength>14000</maxLength>
+                        <rootCauseFirst>true</rootCauseFirst>
+                    </throwableConverter>
+                </stackTrace>
+                <message/>
+                <throwableClassName>
+                    <fieldName>exceptionClass</fieldName>
+                </throwableClassName>
+            </providers>
+        </encoder>
+    </appender>
+    <appender name="CONFIDENTIAL_FILE" class="ch.qos.logback.core.FileAppender">
+        <file>logs/confidential.log</file>
+        <append>false</append>
+        <!-- set immediateFlush to false for much higher logging throughput -->
+        <immediateFlush>true</immediateFlush>
+        <!-- encoders are assigned the type
+             ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+        <encoder>
+            <!--            <pattern>%msg%n</pattern>-->
+            <Pattern>${PATTERN}</Pattern>
+        </encoder>
+    </appender>
+
+    <!-- 設定輸出 file 時的相關設定 -->
+    <appender name="DRF" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>logs/service/app.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!--日誌文件輸出的文件名-->
+            <FileNamePattern>logs/service/app.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <!--日誌文件保留天數-->
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+            <OnMatch>ACCEPT</OnMatch>
+            <OnMismatch>DENY</OnMismatch>
+            <evaluator>
+                <expression>mdc!=null &amp;&amp; ("normal".equals(mdc.get("Sensitive")) ||
+                    "both".equals(mdc.get("Sensitive")))
+                </expression>
+            </evaluator>
+        </filter>
+        <!-- 設定寫入 Log File 的格式設定 -->
+        <encoder>
+            <Pattern>${PATTERN}</Pattern>
+            <charset>${CHARSET}</charset>
+        </encoder>
+    </appender>
+
+    <!-- 設定輸出 file 時的相關設定(有個資，無隱碼) -->
+    <appender name="DRF_SENSITIVE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>logs/service/sensitive_app.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!--日誌文件輸出的文件名-->
+            <FileNamePattern>logs/service/sensitive_app.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <!--日誌文件保留天數-->
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+            <OnMatch>ACCEPT</OnMatch>
+            <OnMismatch>DENY</OnMismatch>
+            <evaluator>
+                <expression>mdc!=null &amp;&amp; ("sensitive".equals(mdc.get("Sensitive")) ||
+                    "both".equals(mdc.get("Sensitive")))
+                </expression>
+            </evaluator>
+        </filter>
+        <!-- 設定寫入 Log File 的格式設定 -->
+        <encoder>
+            <Pattern>${PATTERN}</Pattern>
+            <charset>${CHARSET}</charset>
+        </encoder>
+    </appender>
+
+    <!-- (預設) 設定 ROOT Logger 印出等級及輸出 -->
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+    <!-- (預設) 設定 tw.com.firstbank Logger 印出等級及輸出-->
+    <logger name="tw.com.firstbank.fcbcore.fcbframework" level="DEBUG"/>
+    <logger name="tw.com.firstbank.fcbcore.fcbframework.core.adapter.in.rest.impl.BaseController"
+            level="DEBUG"/>
+    <logger name="tw.com.firstbank.fcbcore.fcbframework.core.adapter.in.rest.RestHeaderInterceptor"
+            level="DEBUG"/>
+    <logger name="tw.com.firstbank.fcbcore.fcbframework.core.adapter.in.rest.RestChannelHeaderInterceptor"
+            level="DEBUG"/>
+    <logger name="tw.com.firstbank.fcbcore.fcbframework.adapters.rabbitmq.adapter.out.event.EventPublisher"
+            level="INFO"/>
+    <logger name="tw.com.firstbank.fcbcore.fcbframework.adapters.rabbitmq.adapter.out.event.RabbitMQEventBusAdapter"
+            level="INFO"/>
+    <logger name="tw.com.firstbank.fcbcore.fcbframework.core.spring.config.AopApLogConfig"
+            level="DEBUG"/>
+    <logger name="tw.com.firstbank.fcbcore.fcbframework.core.spring.config.AopInboundConfig"
+            level="DEBUG">
+        <appender-ref ref="DRF"/>
+        <appender-ref ref="DRF_SENSITIVE"/>
+    </logger>
+    <logger name="tw.com.firstbank.fcbcore.fcbframework.adapters.rabbitmq.spring.config.AopInboundConfig"
+            level="DEBUG">
+        <appender-ref ref="DRF"/>
+        <appender-ref ref="DRF_SENSITIVE"/>
+    </logger>
+    <logger name="tw.com.firstbank.fcbcore.fcbframework.adapters.jms.spring.config.AopInboundConfig"
+            level="DEBUG">
+        <appender-ref ref="DRF"/>
+        <appender-ref ref="DRF_SENSITIVE"/>
+    </logger>
+    <logger name="tw.com.firstbank.fcbcore.fcbframework.core.spring.config.AopOutboundConfig"
+            level="DEBUG">
+        <appender-ref ref="DRF"/>
+        <appender-ref ref="DRF_SENSITIVE"/>
+    </logger>
+    <logger name="tw.com.firstbank.fcbcore.fcbframework.adapters.rabbitmq.spring.config.AopOutboundConfig"
+            level="DEBUG">
+        <appender-ref ref="DRF"/>
+        <appender-ref ref="DRF_SENSITIVE"/>
+    </logger>
+    <logger name="tw.com.firstbank.fcbcore.fcbframework.adapters.jms.spring.config.AopOutboundConfig"
+            level="DEBUG">
+        <appender-ref ref="DRF"/>
+        <appender-ref ref="DRF_SENSITIVE"/>
+    </logger>
+    <logger name="tw.com.firstbank.fcbcore.fcbframework.core.spring.config.SensitiveData"
+            level="INFO" additivity="false">
+        <appender-ref ref="CONFIDENTIAL_FILE"/>
+    </logger>
+
+    <logger name="org.hibernate.SQL" level="DEBUG"/>
+    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE"/>
+    <logger name="org.springframework" level="INFO"/>
+    <logger name="org.springframework.orm" level="INFO"/>
+    <logger name="org.springframework.http.client" level="DEBUG"/>
+    <logger name="org.springframework.web.client.RestTemplate" level="DEBUG"/>
+
+    <!-- 透過不同啟動環境來設定 (依照 pom.xml 的 <activatedProperties> 變數決定) -->
+    <!-- dev/sit/uat 環境 ROOT Logger 印出等級及輸出 -->
+    <springProfile name="dev">
+        <root level="INFO">
+            <appender-ref ref="JSONOUT"/>
+        </root>
+        <logger name="tw.com.firstbank.fcbcore" level="DEBUG"/>
+        <logger name="org.hibernate.SQL" level="INFO"/>
+        <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="INFO"/>
+    </springProfile>
+    <springProfile name="sit">
+        <root level="INFO">
+            <appender-ref ref="JSONOUT"/>
+        </root>
+        <logger name="tw.com.firstbank.fcbcore" level="DEBUG"/>
+        <logger name="org.hibernate.SQL" level="INFO"/>
+        <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="INFO"/>
+    </springProfile>
+    <springProfile name="uat">
+        <root level="INFO">
+            <appender-ref ref="JSONOUT"/>
+        </root>
+        <logger name="tw.com.firstbank.fcbcore" level="DEBUG"/>
+        <logger name="org.hibernate.SQL" level="INFO"/>
+        <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="INFO"/>
+    </springProfile>
+
+    <!-- prod 環境 ROOT Logger 印出等級及輸出 -->
+    <springProfile name="prod">
+        <root level="WARN">
+            <appender-ref ref="JSONOUT"/>
+        </root>
+        <logger name="tw.com.firstbank.fcbcore" level="INFO"/>
+        <logger name="org.hibernate.SQL" level="INFO"/>
+        <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="INFO"/>
+    </springProfile>
+
+</configuration>
