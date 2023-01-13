@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.openMocks;
 
@@ -19,6 +20,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import tw.com.firstbank.fcbcore.fcbframework.core.application.exception.BusinessException;
 import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.repository.mainframe.api.FxRateResponse;
+import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.repository.mainframe.api.MainFrameResponse;
 import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.repository.mainframe.api.MainframeService;
 import tw.com.firstbank.fcbcore.fir.service.example.application.exception.ServiceStatusCode;
 import tw.com.firstbank.fcbcore.fir.service.example.application.in.S061.S061Service;
@@ -55,7 +57,7 @@ public class RefundTxnServiceTest {
 	@BeforeEach
 	public void setup() {
 		openMocks(this);
-		s061Service = new S061Service(refundTxnRepository,mainframeService);
+		s061Service = new S061Service(refundTxnRepository,mainframeService,refundTxn);
 		updateS061RequestCommand = new UpdateS061RequestCommand();
 		updateS061RequestCommand.setVersion("01");
 		updateS061RequestCommand.setAdviceBranch("091");
@@ -203,6 +205,41 @@ public class RefundTxnServiceTest {
 		Mockito.verify(mainframeService,atLeastOnce()).isReasonableFxRate(any());
 	}
 
+
+	//test 6-1 compose form msg to mainframe  (FOSGLIF2、FOSTXLS1) (Pass)
+	@Test
+	void ioMainFrame_WillCallMainFrameService_IOSuccess() throws Exception {
+
+		//arrange
+		Optional<RefundTxn> refundTxnOptional= Optional.of(refundTxn);
+
+		MainFrameResponse mainFrameResponse = new MainFrameResponse();
+		mainFrameResponse.setReturnCode("0000");
+		mainFrameResponse.setTxnNo(12345);
+		Mockito.when(mainframeService.mainframeIO(any())).thenReturn(mainFrameResponse);
+		//act
+
+		boolean isIOSuccess = s061Service.mainframeIO(updateS061RequestCommand);
+		//assert
+		Assertions.assertEquals(true,isIOSuccess);
+		Mockito.verify(mainframeService).mainframeIO(any());
+	}
+
+	//test 6-2 compose form msg to mainframe  (FOSGLIF2、FOSTXLS1) (No Pass)
+	@Test
+	void ioMainFrame_WillCallMainFrameService_IOFail() throws Exception {
+
+		//arrange
+		MainFrameResponse mainFrameResponse = new MainFrameResponse();
+		mainFrameResponse.setReturnCode("error");
+		Mockito.when(mainframeService.mainframeIO(any())).thenReturn(mainFrameResponse);
+		//act
+		boolean isIOSuccess = s061Service.mainframeIO(updateS061RequestCommand);
+		//assert
+		Assertions.assertEquals(false,isIOSuccess);
+		Mockito.verify(mainframeService,times(1)).mainframeIO(any());
+	}
+
 	//test 7-1 update DB Success (Pass)
 	@Test
 	void UpdateRefundTxn_WillSaveRefundTxn_UpdateSuccess() throws Exception {
@@ -216,7 +253,7 @@ public class RefundTxnServiceTest {
 		Mockito.verify(refundTxnRepository).save(any());
 	}
 
-	//test 7-2 update DB fail (No Pass)
+	//test 7-2 update DB fail Exception (No Pass)
 	@Test
 	void UpdateRefundTxn_WillSaveRefundTxn_UpdateFail() {
 		//arrange

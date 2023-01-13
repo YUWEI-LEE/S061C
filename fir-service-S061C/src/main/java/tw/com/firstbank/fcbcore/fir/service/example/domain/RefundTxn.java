@@ -58,7 +58,7 @@ public class RefundTxn extends BaseAggregate<RefundTxn, UUID> implements Seriali
 	private String transferCurrency;
 	private String transferCurrencyCode;
 	private BigDecimal transferFee;
-
+	private int txnNo;
 
 	@Override
 	public String getAggregateId() {

@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import tw.com.firstbank.fcbcore.fcbframework.core.application.exception.BusinessException;
 import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.repository.mainframe.api.FxRateRequest;
 import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.repository.mainframe.api.FxRateResponse;
+import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.repository.mainframe.api.MainFrameRequest;
+import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.repository.mainframe.api.MainFrameResponse;
 import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.repository.mainframe.api.MainframeService;
 import tw.com.firstbank.fcbcore.fir.service.example.application.exception.ServiceStatusCode;
 import tw.com.firstbank.fcbcore.fir.service.example.application.in.S061.api.UpdateS061RequestCommand;
@@ -27,8 +29,7 @@ public class S061Service {
 	private final RefundTxnRepository refundTxnRepository;
 
 	private final MainframeService mainframeService;
-
-
+	private RefundTxn refundTxn;
 
 
 	public RefundTxn getRefundTxn(String seqNo, String adviceBranch){
@@ -77,11 +78,26 @@ public class S061Service {
 	}
 
 
+	public boolean mainframeIO(UpdateS061RequestCommand updateS061RequestCommand) throws Exception {
+		boolean isPass = false;
+		MainFrameRequest mainFrameRequest = new MainFrameRequest();
+		mainFrameRequest.setData(updateS061RequestCommand.getSeqNo());
+		MainFrameResponse mainFrameResponse = mainframeService.mainframeIO(mainFrameRequest);
+		if (mainFrameResponse.getReturnCode().equals(ServiceStatusCode.SUCCESS.getCode())){
+			refundTxn = new RefundTxn();
+			refundTxn.setTxnNo(mainFrameResponse.getTxnNo());
+			isPass = updateRefundTxn(refundTxn);
+			return isPass;
+		}else {
+			return isPass;
+		}
+	}
+
 	public boolean updateRefundTxn(RefundTxn refundTxn) throws Exception {
 
 		boolean isSaveSuccess = false;
 		try{
-			RefundTxn refundTxnOutput = refundTxnRepository.save(refundTxn);
+			refundTxnRepository.save(refundTxn);
 			isSaveSuccess = true;
 		}catch (Exception ex){
 			log.error("儲存資料庫失敗",ex);
@@ -91,6 +107,5 @@ public class S061Service {
 
 		return isSaveSuccess;
 	}
-
 
 }
