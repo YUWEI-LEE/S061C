@@ -23,6 +23,9 @@ import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.repository.mainf
 import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.repository.mainframe.api.MainFrameResponse;
 import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.repository.mainframe.api.MainframeService;
 import tw.com.firstbank.fcbcore.fir.service.example.application.exception.ServiceStatusCode;
+import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.FxRateRequest;
+import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.FxRateResponse;
+import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.MainframeService;
 import tw.com.firstbank.fcbcore.fir.service.example.application.in.S061.S061Service;
 import tw.com.firstbank.fcbcore.fir.service.example.application.in.S061.mapper.RefundTxnDto;
 import tw.com.firstbank.fcbcore.fir.service.example.application.out.repository.RefundTxnRepository;
@@ -57,7 +60,7 @@ public class RefundTxnServiceTest {
 	@BeforeEach
 	public void setup() {
 		openMocks(this);
-		s061Service = new S061Service(refundTxnRepository,mainframeService,refundTxn);
+		s061Service = new S061Service(refundTxnRepository,mainframeService);
 		updateS061RequestCommand = new UpdateS061RequestCommand();
 		updateS061RequestCommand.setVersion("01");
 		updateS061RequestCommand.setAdviceBranch("091");
@@ -67,6 +70,7 @@ public class RefundTxnServiceTest {
 		refundTxn.setSeqNo("1234567");
 		refundTxn.setAdviceBranch("091");
 		refundTxn.setProcessDate("20230113");
+		refundTxn.setCurrencyCode("USD");
 	}
 
 	//test 2-1 Compare Version (Pass)
@@ -205,6 +209,23 @@ public class RefundTxnServiceTest {
 		Mockito.verify(mainframeService,atLeastOnce()).isReasonableFxRate(any());
 	}
 
+	//test 5-1 update charge fee -> call FxRateService (Pass)
+	@Test
+	void updateCharge_WillCallMainframeService_ToGetFxRate(){
+		//arrange
+		FxRateResponse response = new FxRateResponse();
+		response.setFxRate(new BigDecimal(30.5));
+		response.setReturnCode("0000");
+		Mockito.when(mainframeService.getFxRate(any())).thenReturn(response);
+		//act
+		BigDecimal fxRate= s061Service.getFxRate(updateS061RequestCommand);
+		//assert
+		Mockito.verify(mainframeService,atLeastOnce()).getFxRate(any());
+		Assertions.assertEquals(new BigDecimal(30.5), fxRate);
+	}
+
+
+
 
 	//test 6-1 compose form msg to mainframe  (FOSGLIF2、FOSTXLS1) (Pass)
 	@Test
@@ -253,7 +274,7 @@ public class RefundTxnServiceTest {
 		Mockito.verify(refundTxnRepository).save(any());
 	}
 
-	//test 7-2 update DB fail Exception (No Pass)
+	//test 7-2 update DB fail (No Pass)
 	@Test
 	void UpdateRefundTxn_WillSaveRefundTxn_UpdateFail() {
 		//arrange

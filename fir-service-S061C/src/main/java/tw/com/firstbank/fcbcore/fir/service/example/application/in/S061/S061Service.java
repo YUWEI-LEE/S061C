@@ -13,6 +13,10 @@ import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.repository.mainf
 import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.repository.mainframe.api.MainFrameRequest;
 import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.repository.mainframe.api.MainFrameResponse;
 import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.repository.mainframe.api.MainframeService;
+import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.FxRateRequest;
+import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.FxRateResponse;
+import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.MainframeService;
+import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.impl.MainframeServiceImpl;
 import tw.com.firstbank.fcbcore.fir.service.example.application.exception.ServiceStatusCode;
 import tw.com.firstbank.fcbcore.fir.service.example.application.in.S061.api.UpdateS061RequestCommand;
 import tw.com.firstbank.fcbcore.fir.service.example.application.out.repository.RefundTxnRepository;
@@ -29,7 +33,8 @@ public class S061Service {
 	private final RefundTxnRepository refundTxnRepository;
 
 	private final MainframeService mainframeService;
-	private RefundTxn refundTxn;
+
+
 
 
 	public RefundTxn getRefundTxn(String seqNo, String adviceBranch){
@@ -97,7 +102,7 @@ public class S061Service {
 
 		boolean isSaveSuccess = false;
 		try{
-			refundTxnRepository.save(refundTxn);
+			RefundTxn refundTxnOutput = refundTxnRepository.save(refundTxn);
 			isSaveSuccess = true;
 		}catch (Exception ex){
 			log.error("儲存資料庫失敗",ex);
@@ -108,4 +113,14 @@ public class S061Service {
 		return isSaveSuccess;
 	}
 
+	public BigDecimal getFxRate(UpdateS061RequestCommand updateS061RequestCommand){
+		FxRateRequest fxRateRequest = new FxRateRequest();
+		fxRateRequest.setCurrencyCode(updateS061RequestCommand.getCurrencyCode());
+		FxRateResponse fxRateResponse = mainframeService.getFxRate(fxRateRequest);
+		if (fxRateResponse.getReturnCode().equals(ServiceStatusCode.SUCCESS.getCode())){
+			return fxRateResponse.getFxRate();
+		}else {
+			return BigDecimal.ZERO;
+		}
+	}
 }
