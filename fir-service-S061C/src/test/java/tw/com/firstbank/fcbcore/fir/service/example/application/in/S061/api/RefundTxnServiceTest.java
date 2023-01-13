@@ -63,9 +63,11 @@ public class RefundTxnServiceTest {
 		updateS061RequestCommand.setVersion("01");
 		updateS061RequestCommand.setAdviceBranch("091");
 		updateS061RequestCommand.setSeqNo("1234567");
+		updateS061RequestCommand.setProcessDate("20230113");
 		refundTxn = new RefundTxn();
 		refundTxn.setSeqNo("1234567");
 		refundTxn.setAdviceBranch("091");
+		refundTxn.setProcessDate("20230113");
 	}
 
 	//test 2-1 Compare Version (Pass)
@@ -119,6 +121,24 @@ public class RefundTxnServiceTest {
 		Mockito.verify(refundTxnRepository).getS061BySeqNoAndAdviceBranch(anyString(),anyString());
 
 	}
+
+	//test 3-1 Compare Date (Pass)
+	@Test
+	void checkDate_WillCallRefundTxn_DateEqualPass(){
+		//arrange
+		Optional<RefundTxn> refundTxnOptional= Optional.of(refundTxn);
+
+		Mockito.when(refundTxnRepository.getS061BySeqNoAndAdviceBranch(anyString(),anyString())).thenReturn(refundTxnOptional);
+		//act
+		Boolean isCheckDate= s061Service.checkDate(updateS061RequestCommand);
+
+		//assert
+		Assertions.assertEquals(true,isCheckDate);
+		//Mockito.verify(refundTxnRepository).getS061BySeqNoAndAdviceBranch(anyString(),anyString());
+
+	}
+
+
 	//test 4-1 compare reasonable Rate (Pass)
 	@Test
 	void checkReasonableFxRate_WillCallMainframeService_ToCheckPass(){

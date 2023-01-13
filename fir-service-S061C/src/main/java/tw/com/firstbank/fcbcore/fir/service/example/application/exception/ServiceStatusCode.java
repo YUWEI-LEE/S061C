@@ -17,6 +17,7 @@ public enum ServiceStatusCode {
 	OVER_FXRATE("ED85","承作匯率超過合理範圍"),
 	DATA_NOT_FOUND("9998","查無資料"),
 	INVALID_VERSION("9999","版本別錯誤"),
+	INVALID_DATE("9999","案件日期錯誤"),
 
 	SUCCESS("0000","交易成功");
 
