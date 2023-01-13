@@ -18,11 +18,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import tw.com.firstbank.fcbcore.fcbframework.core.application.exception.BusinessException;
-import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.repository.mainframe.api.FxRateResponse;
-import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.repository.mainframe.api.MainframeService;
-import tw.com.firstbank.fcbcore.fir.service.example.application.exception.ServiceStatusCode;
+import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.FxRateRequest;
+import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.FxRateResponse;
+import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.MainframeService;
 import tw.com.firstbank.fcbcore.fir.service.example.application.in.S061.S061Service;
-import tw.com.firstbank.fcbcore.fir.service.example.application.in.S061.mapper.RefundTxnDto;
 import tw.com.firstbank.fcbcore.fir.service.example.application.out.repository.RefundTxnRepository;
 import tw.com.firstbank.fcbcore.fir.service.example.domain.RefundTxn;
 
@@ -65,6 +64,7 @@ public class RefundTxnServiceTest {
 		refundTxn.setSeqNo("1234567");
 		refundTxn.setAdviceBranch("091");
 		refundTxn.setProcessDate("20230113");
+		refundTxn.setCurrencyCode("USD");
 	}
 
 	//test 2-1 Compare Version (Pass)
@@ -202,6 +202,23 @@ public class RefundTxnServiceTest {
 		Assertions.assertEquals(false,isPass);
 		Mockito.verify(mainframeService,atLeastOnce()).isReasonableFxRate(any());
 	}
+
+	//test 5-1 update charge fee -> call FxRateService (Pass)
+	@Test
+	void updateCharge_WillCallMainframeService_ToGetFxRate(){
+		//arrange
+		FxRateResponse response = new FxRateResponse();
+		response.setFxRate(new BigDecimal(30.5));
+		response.setReturnCode("0000");
+		Mockito.when(mainframeService.getFxRate(any())).thenReturn(response);
+		//act
+		BigDecimal fxRate= s061Service.getFxRate(updateS061RequestCommand);
+		//assert
+		Mockito.verify(mainframeService,atLeastOnce()).getFxRate(any());
+		Assertions.assertEquals(new BigDecimal(30.5), fxRate);
+	}
+
+
 
 	//test 7-1 update DB Success (Pass)
 	@Test

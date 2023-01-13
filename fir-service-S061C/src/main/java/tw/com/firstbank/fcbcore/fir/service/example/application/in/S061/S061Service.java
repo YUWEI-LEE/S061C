@@ -1,16 +1,16 @@
 package tw.com.firstbank.fcbcore.fir.service.example.application.in.S061;
 
-import java.sql.SQLDataException;
-import java.sql.SQLException;
+import java.math.BigDecimal;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import tw.com.firstbank.fcbcore.fcbframework.core.application.exception.BusinessException;
-import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.repository.mainframe.api.FxRateRequest;
-import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.repository.mainframe.api.FxRateResponse;
-import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.repository.mainframe.api.MainframeService;
+import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.FxRateRequest;
+import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.FxRateResponse;
+import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.MainframeService;
+import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.impl.MainframeServiceImpl;
 import tw.com.firstbank.fcbcore.fir.service.example.application.exception.ServiceStatusCode;
 import tw.com.firstbank.fcbcore.fir.service.example.application.in.S061.api.UpdateS061RequestCommand;
 import tw.com.firstbank.fcbcore.fir.service.example.application.out.repository.RefundTxnRepository;
@@ -92,5 +92,14 @@ public class S061Service {
 		return isSaveSuccess;
 	}
 
-
+	public BigDecimal getFxRate(UpdateS061RequestCommand updateS061RequestCommand){
+		FxRateRequest fxRateRequest = new FxRateRequest();
+		fxRateRequest.setCurrencyCode(updateS061RequestCommand.getCurrencyCode());
+		FxRateResponse fxRateResponse = mainframeService.getFxRate(fxRateRequest);
+		if (fxRateResponse.getReturnCode().equals(ServiceStatusCode.SUCCESS.getCode())){
+			return fxRateResponse.getFxRate();
+		}else {
+			return BigDecimal.ZERO;
+		}
+	}
 }

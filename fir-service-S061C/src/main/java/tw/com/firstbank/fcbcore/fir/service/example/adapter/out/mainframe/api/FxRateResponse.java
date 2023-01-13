@@ -1,5 +1,6 @@
-package tw.com.firstbank.fcbcore.fir.service.example.adapter.out.repository.mainframe.api;
+package tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api;
 
+import java.math.BigDecimal;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -10,5 +11,7 @@ import lombok.ToString;
 public class FxRateResponse {
 
 	private String returnCode;
+
+	private BigDecimal fxRate;
 
 }
