@@ -62,7 +62,7 @@ public class S061Service {
 		return true;
 	}
 
-	public boolean checkResonableFxRate(UpdateS061RequestCommand updateS061RequestCommand){
+	public boolean checkReasonableFxRate(UpdateS061RequestCommand updateS061RequestCommand){
 
 		FxRateRequest fxRateRequest = new FxRateRequest();
 		fxRateRequest.setFxRate(updateS061RequestCommand.getSpotRate());

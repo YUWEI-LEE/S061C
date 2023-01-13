@@ -30,15 +30,12 @@ import tw.com.firstbank.fcbcore.fir.service.example.domain.RefundTxn;
 //2.compare  version
 //3.check date
 //4.compare reasonable Rate
-//5.s061 update
-//6.update charge fee
-//7.compose form msg to mainframe
-//8.mainframeservice
-//9.s061 get(seq)
-//10. account no update (txn-no)
-//11.s061 update
-//12.response body
-//13.print
+//5.update charge fee -> call FxRateService
+//6.compose form msg to mainframe  (FOSGLIF2、FOSTXLS1)
+//6.1 account no update (txn-no)
+//7.S061 update
+//8.response body
+//9.print
 
 public class RefundTxnServiceTest {
 
@@ -106,6 +103,7 @@ public class RefundTxnServiceTest {
 
 	}
 
+	//test 2-3 Compare Version (No Data Pass) BusinessException
 	@Test
 	void checkVersion_WillCallRefundTxn_NoDataNoPass(){
 		//arrange
@@ -165,7 +163,7 @@ public class RefundTxnServiceTest {
 		fxRateResponse.setReturnCode("0000");
 		Mockito.when(mainframeService.isReasonableFxRate(any())).thenReturn(fxRateResponse);
 		//act
-		Boolean isPass= s061Service.checkResonableFxRate(updateS061RequestCommand);
+		Boolean isPass= s061Service.checkReasonableFxRate(updateS061RequestCommand);
 
 		//assert
 		Assertions.assertEquals(true,isPass);
@@ -182,14 +180,14 @@ public class RefundTxnServiceTest {
 		fxRateResponse.setReturnCode("ED85");
 		Mockito.when(mainframeService.isReasonableFxRate(any())).thenReturn(fxRateResponse);
 		//act
-		Boolean isPass= s061Service.checkResonableFxRate(updateS061RequestCommand);
+		Boolean isPass= s061Service.checkReasonableFxRate(updateS061RequestCommand);
 
 		//assert
 		Assertions.assertEquals(false,isPass);
 		Mockito.verify(mainframeService,atLeastOnce()).isReasonableFxRate(any());
 	}
 
-	//test 5-1 update DB Success (Pass)
+	//test 7-1 update DB Success (Pass)
 	@Test
 	void UpdateRefundTxn_WillSaveRefundTxn_UpdateSuccess() throws Exception {
 		//arrange
@@ -202,7 +200,7 @@ public class RefundTxnServiceTest {
 		Mockito.verify(refundTxnRepository).save(any());
 	}
 
-	//test 5-2 update DB fail (No Pass)
+	//test 7-2 update DB fail (No Pass)
 	@Test
 	void UpdateRefundTxn_WillSaveRefundTxn_UpdateFail() {
 		//arrange
