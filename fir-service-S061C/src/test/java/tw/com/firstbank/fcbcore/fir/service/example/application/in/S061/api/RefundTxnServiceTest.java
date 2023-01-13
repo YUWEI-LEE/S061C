@@ -151,6 +151,22 @@ public class RefundTxnServiceTest {
 
 		assertEquals("案件日期錯誤", ex.getMessage());
 		//Mockito.verify(refundTxnRepository).getS061BySeqNoAndAdviceBranch(anyString(),anyString());
+	}
+
+	//test 3-3 Compare Date (No Pass) BusinessException NO DATA
+	@Test
+	void checkDate_WillCallRefundTxn_NoDataNoPass(){
+		//arrange
+		refundTxn = null;
+		Optional<RefundTxn> refundTxnOptional= Optional.ofNullable(refundTxn);
+		Mockito.when(refundTxnRepository.getS061BySeqNoAndAdviceBranch(anyString(),anyString())).thenReturn(refundTxnOptional);
+		//act
+		//assert
+		var ex = Assertions.assertThrows(BusinessException.class, ()->{s061Service.checkVersion(
+			updateS061RequestCommand);});
+
+		assertEquals("查無資料", ex.getMessage());
+		Mockito.verify(refundTxnRepository).getS061BySeqNoAndAdviceBranch(anyString(),anyString());
 
 	}
 
