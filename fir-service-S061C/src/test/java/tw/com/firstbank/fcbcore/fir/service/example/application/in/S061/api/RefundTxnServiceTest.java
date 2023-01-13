@@ -19,9 +19,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import tw.com.firstbank.fcbcore.fcbframework.core.application.exception.BusinessException;
-import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.repository.mainframe.api.FxRateResponse;
-import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.repository.mainframe.api.MainFrameResponse;
-import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.repository.mainframe.api.MainframeService;
+import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.FxRateResponse;
+import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.MainFrameResponse;
+import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.MainframeService;
 import tw.com.firstbank.fcbcore.fir.service.example.application.exception.ServiceStatusCode;
 import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.FxRateRequest;
 import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.FxRateResponse;
@@ -60,7 +60,7 @@ public class RefundTxnServiceTest {
 	@BeforeEach
 	public void setup() {
 		openMocks(this);
-		s061Service = new S061Service(refundTxnRepository,mainframeService);
+		s061Service = new S061Service(refundTxnRepository,mainframeService,refundTxn);
 		updateS061RequestCommand = new UpdateS061RequestCommand();
 		updateS061RequestCommand.setVersion("01");
 		updateS061RequestCommand.setAdviceBranch("091");
