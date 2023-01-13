@@ -138,6 +138,23 @@ public class RefundTxnServiceTest {
 
 	}
 
+	//test 3-2 Compare Date (No Pass) BusinessException INVALID_DATE
+	@Test
+	void checkDate_WillCallRefundTxn_DateNotEqualNoPass(){
+		//arrange
+		refundTxn.setProcessDate("20230115");
+		Optional<RefundTxn> refundTxnOptional= Optional.of(refundTxn);
+
+		Mockito.when(refundTxnRepository.getS061BySeqNoAndAdviceBranch(anyString(),anyString())).thenReturn(refundTxnOptional);
+		//act
+		//assert
+		var ex = Assertions.assertThrows(BusinessException.class, ()->{s061Service.checkDate(
+			updateS061RequestCommand);});
+
+		assertEquals("案件日期錯誤", ex.getMessage());
+		//Mockito.verify(refundTxnRepository).getS061BySeqNoAndAdviceBranch(anyString(),anyString());
+
+	}
 
 	//test 4-1 compare reasonable Rate (Pass)
 	@Test
