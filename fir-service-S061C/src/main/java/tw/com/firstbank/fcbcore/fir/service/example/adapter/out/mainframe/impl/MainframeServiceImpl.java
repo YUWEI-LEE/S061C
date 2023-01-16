@@ -24,8 +24,8 @@ public class MainframeServiceImpl implements MainframeService {
 	}
 
 	@Override
-	public FxRateResponse getFxRate(FxRateRequest fxRateRequest) {
-		fxRateResponse.setFxRate(BigDecimal.ZERO);
+	public FxRateResponse getToUsdRate(FxRateRequest fxRateRequest) {
+		fxRateResponse.setToUsdRate(BigDecimal.ZERO);
 		return fxRateResponse;
 	}
 }

@@ -114,12 +114,12 @@ public class S061Service {
 		return isSaveSuccess;
 	}
 
-	public BigDecimal getFxRate(UpdateS061RequestCommand updateS061RequestCommand){
+	public BigDecimal getToUsdRate(UpdateS061RequestCommand updateS061RequestCommand){
 		FxRateRequest fxRateRequest = new FxRateRequest();
 		fxRateRequest.setCurrencyCode(updateS061RequestCommand.getCurrencyCode());
-		FxRateResponse fxRateResponse = mainframeService.getFxRate(fxRateRequest);
+		FxRateResponse fxRateResponse = mainframeService.getToUsdRate(fxRateRequest);
 		if (fxRateResponse.getReturnCode().equals(ServiceStatusCode.SUCCESS.getCode())){
-			return fxRateResponse.getFxRate();
+			return fxRateResponse.getToUsdRate();
 		}else {
 			return BigDecimal.ZERO;
 		}

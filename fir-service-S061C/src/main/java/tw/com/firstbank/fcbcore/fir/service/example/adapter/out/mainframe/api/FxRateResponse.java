@@ -12,6 +12,6 @@ public class FxRateResponse {
 
 	private String returnCode;
 
-	private BigDecimal fxRate;
+	private BigDecimal toUsdRate;
 
 }

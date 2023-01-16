@@ -209,23 +209,35 @@ public class RefundTxnServiceTest {
 		Mockito.verify(mainframeService,atLeastOnce()).isReasonableFxRate(any());
 	}
 
-	//test 5-1 update charge fee -> call FxRateService (Pass)
+	//test 5-1 get charge fee -> call FxRateService (Pass)
 	@Test
-	void updateCharge_WillCallMainframeService_ToGetFxRate(){
+	void givenCurrencyCode_WillCallMainframeService_ToGetFxRatePass(){
 		//arrange
 		FxRateResponse response = new FxRateResponse();
-		response.setFxRate(new BigDecimal(30.5));
+		response.setToUsdRate(new BigDecimal(30.5));
 		response.setReturnCode("0000");
-		Mockito.when(mainframeService.getFxRate(any())).thenReturn(response);
+		Mockito.when(mainframeService.getToUsdRate(any())).thenReturn(response);
 		//act
-		BigDecimal fxRate= s061Service.getFxRate(updateS061RequestCommand);
+		BigDecimal fxRate= s061Service.getToUsdRate(updateS061RequestCommand);
 		//assert
-		Mockito.verify(mainframeService,atLeastOnce()).getFxRate(any());
+		Mockito.verify(mainframeService,atLeastOnce()).getToUsdRate(any());
 		Assertions.assertEquals(new BigDecimal(30.5), fxRate);
 	}
 
-
-
+	//test 5-2 get charge fee -> call FxRateService (NO Pass)
+	@Test
+	void givenCurrencyCode_WillCallMainframeService_ToGetFxRateNoPass(){
+		//arrange
+		FxRateResponse response = new FxRateResponse();
+		//response.setFxRate(new BigDecimal(30.5));
+		response.setReturnCode("0000");
+		Mockito.when(mainframeService.getToUsdRate(any())).thenReturn(response);
+		//act
+		BigDecimal fxRate= s061Service.getToUsdRate(updateS061RequestCommand);
+		//assert
+		Mockito.verify(mainframeService,atLeastOnce()).getToUsdRate(any());
+		Assertions.assertEquals(null, fxRate);
+	}
 
 	//test 6-1 compose form msg to mainframe  (FOSGLIF2、FOSTXLS1) (Pass)
 	@Test

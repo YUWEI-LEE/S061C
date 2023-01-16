@@ -9,5 +9,5 @@ public interface MainframeService {
 	public MainFrameResponse mainframeIO (MainFrameRequest mainFrameRequest);
 
 
-	public FxRateResponse getFxRate (FxRateRequest fxRateRequest);
+	public FxRateResponse getToUsdRate (FxRateRequest fxRateRequest);
 }
