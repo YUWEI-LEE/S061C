@@ -30,6 +30,7 @@ import tw.com.firstbank.fcbcore.fir.service.example.application.in.S061.S061Serv
 import tw.com.firstbank.fcbcore.fir.service.example.application.in.S061.mapper.RefundTxnDto;
 import tw.com.firstbank.fcbcore.fir.service.example.application.out.repository.RefundTxnRepository;
 import tw.com.firstbank.fcbcore.fir.service.example.domain.RefundTxn;
+import tw.com.firstbank.fcbcore.fir.service.example.domain.S061Report;
 
 //1.S061c get
 //2.compare  version
@@ -40,7 +41,6 @@ import tw.com.firstbank.fcbcore.fir.service.example.domain.RefundTxn;
 //6.1 account no update (txn-no)
 //7.S061 update
 //8.response body
-//9.print
 
 public class RefundTxnServiceTest {
 
@@ -71,6 +71,7 @@ public class RefundTxnServiceTest {
 		refundTxn.setAdviceBranch("091");
 		refundTxn.setProcessDate("20230113");
 		refundTxn.setCurrencyCode("USD");
+		refundTxn.setVersion("01");
 	}
 
 	//test 2-1 Compare Version (Pass)
@@ -78,16 +79,12 @@ public class RefundTxnServiceTest {
 	void checkVersion_WillCallRefundTxn_VersionEqualPass(){
 		//arrange
 		refundTxn.setVersion("01");
-		Optional<RefundTxn> refundTxnOptional= Optional.of(refundTxn);
 
-
-		Mockito.when(refundTxnRepository.getS061BySeqNoAndAdviceBranch(anyString(),anyString())).thenReturn(refundTxnOptional);
 		//act
-	    Boolean isCheckVersion= s061Service.checkVersion(updateS061RequestCommand);
+	    Boolean isCheckVersion= s061Service.checkVersion(refundTxn.getVersion(),updateS061RequestCommand.getVersion());
 
 		//assert
 		Assertions.assertEquals(true,isCheckVersion);
-		Mockito.verify(refundTxnRepository).getS061BySeqNoAndAdviceBranch(anyString(),anyString());
 
 	}
 
@@ -102,27 +99,10 @@ public class RefundTxnServiceTest {
 		//act
 		//assert
 		var ex = Assertions.assertThrows(BusinessException.class, ()->{s061Service.checkVersion(
-			updateS061RequestCommand);});
+			refundTxn.getVersion(),updateS061RequestCommand.getVersion());});
 
 		assertEquals("版本別錯誤", ex.getMessage());
-		Mockito.verify(refundTxnRepository).getS061BySeqNoAndAdviceBranch(anyString(),anyString());
-
-	}
-
-	//test 2-3 Compare Version (No Data Pass) BusinessException
-	@Test
-	void checkVersion_WillCallRefundTxn_NoDataNoPass(){
-		//arrange
-		refundTxn = null;
-		Optional<RefundTxn> refundTxnOptional= Optional.ofNullable(refundTxn);
-		Mockito.when(refundTxnRepository.getS061BySeqNoAndAdviceBranch(anyString(),anyString())).thenReturn(refundTxnOptional);
-		//act
-		//assert
-		var ex = Assertions.assertThrows(BusinessException.class, ()->{s061Service.checkVersion(
-			updateS061RequestCommand);});
-
-		assertEquals("查無資料", ex.getMessage());
-		Mockito.verify(refundTxnRepository).getS061BySeqNoAndAdviceBranch(anyString(),anyString());
+		Mockito.verify(refundTxnRepository,times(0)).getS061BySeqNoAndAdviceBranch(anyString(),anyString());
 
 	}
 
@@ -168,7 +148,7 @@ public class RefundTxnServiceTest {
 		Mockito.when(refundTxnRepository.getS061BySeqNoAndAdviceBranch(anyString(),anyString())).thenReturn(refundTxnOptional);
 		//act
 		//assert
-		var ex = Assertions.assertThrows(BusinessException.class, ()->{s061Service.checkVersion(
+		var ex = Assertions.assertThrows(BusinessException.class, ()->{s061Service.checkDate(
 			updateS061RequestCommand);});
 
 		assertEquals("查無資料", ex.getMessage());
@@ -297,6 +277,18 @@ public class RefundTxnServiceTest {
 		//assert
 		Assertions.assertThrows(RuntimeException.class,()->s061Service.updateRefundTxn(refundTxn));
 		Mockito.verify(refundTxnRepository).save(any());
+	}
+
+	//test 8.response body print
+	@Test
+	void printForm_WillPrintReponse_PrintSuccess() throws Exception {
+		//arrange
+
+		//act
+		S061Report s061Report = s061Service.print();
+		//assert
+		Assertions.assertNotNull(s061Report);
+//		Mockito.verify(refundTxnRepository).save(any());
 	}
 
 }

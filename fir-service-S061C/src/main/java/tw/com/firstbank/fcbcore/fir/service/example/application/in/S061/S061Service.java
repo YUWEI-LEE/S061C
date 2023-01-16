@@ -22,6 +22,7 @@ import tw.com.firstbank.fcbcore.fir.service.example.application.exception.Servic
 import tw.com.firstbank.fcbcore.fir.service.example.application.in.S061.api.UpdateS061RequestCommand;
 import tw.com.firstbank.fcbcore.fir.service.example.application.out.repository.RefundTxnRepository;
 import tw.com.firstbank.fcbcore.fir.service.example.domain.RefundTxn;
+import tw.com.firstbank.fcbcore.fir.service.example.domain.S061Report;
 
 
 
@@ -49,10 +50,9 @@ public class S061Service {
 		return refundTxn;
 	}
 
-	public boolean checkVersion(UpdateS061RequestCommand updateS061RequestCommand){
+	public boolean checkVersion(String refundTxnVersion,String commandVersion){
 
-		RefundTxn refundTxn= getRefundTxn(updateS061RequestCommand.getSeqNo(),updateS061RequestCommand.getAdviceBranch());
-		if(!updateS061RequestCommand.getVersion().equals(refundTxn.getVersion())){
+		if(!commandVersion.equals(refundTxnVersion)){
 			throw new BusinessException(ServiceStatusCode.INVALID_VERSION.getCode(),ServiceStatusCode.INVALID_VERSION.getMessage());
 		}
 
@@ -124,4 +124,13 @@ public class S061Service {
 			return BigDecimal.ZERO;
 		}
 	}
+
+	public S061Report print(){
+		S061Report s061Report = new S061Report();
+		s061Report.setReportOperator("160474");
+		s061Report.setReportDate("20220116");
+
+		return s061Report;
+	}
+
 }

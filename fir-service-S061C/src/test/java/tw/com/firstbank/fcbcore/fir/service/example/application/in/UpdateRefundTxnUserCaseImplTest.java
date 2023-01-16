@@ -17,20 +17,17 @@ public class UpdateRefundTxnUserCaseImplTest {
 //		mock = Mockito.mock(S061Repository.class);
 //	}
 
+
 	@Test
-	void givenSeqNo_WillReturn_S061Info() throws ValidationException{
+	void updateS061_WillReturn_printForm() throws ValidationException{
 		//arrange
 		updateS061RequestCommand = new UpdateS061RequestCommand();
 		updateS061RequestCommand.setSeqNo("1234567");
 		updateS061RequestCommand.setAdviceBranch("091");
-
-
-
 		//act
 
 
 		//assert
-
 
 
 	}
