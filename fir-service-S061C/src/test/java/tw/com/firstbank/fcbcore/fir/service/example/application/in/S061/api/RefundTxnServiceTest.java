@@ -65,11 +65,11 @@ public class RefundTxnServiceTest {
 		updateS061RequestCommand.setVersion("01");
 		updateS061RequestCommand.setAdviceBranch("091");
 		updateS061RequestCommand.setSeqNo("1234567");
-		updateS061RequestCommand.setProcessDate("20230113");
+		updateS061RequestCommand.setProcessDate("20230115");
 		refundTxn = new RefundTxn();
 		refundTxn.setSeqNo("1234567");
 		refundTxn.setAdviceBranch("091");
-		refundTxn.setProcessDate("20230113");
+		refundTxn.setProcessDate("20230115");
 		refundTxn.setCurrencyCode("USD");
 		refundTxn.setVersion("01");
 	}
@@ -110,51 +110,30 @@ public class RefundTxnServiceTest {
 	@Test
 	void checkDate_WillCallRefundTxn_DateEqualPass(){
 		//arrange
-		Optional<RefundTxn> refundTxnOptional= Optional.of(refundTxn);
-
-		Mockito.when(refundTxnRepository.getS061BySeqNoAndAdviceBranch(anyString(),anyString())).thenReturn(refundTxnOptional);
+		refundTxn.setProcessDate("20230115");
 		//act
-		Boolean isCheckDate= s061Service.checkDate(updateS061RequestCommand);
-
+		Boolean isCheckDate= s061Service.checkDate(refundTxn.getProcessDate(),updateS061RequestCommand.getProcessDate());
 		//assert
 		Assertions.assertEquals(true,isCheckDate);
-		//Mockito.verify(refundTxnRepository).getS061BySeqNoAndAdviceBranch(anyString(),anyString());
-
 	}
 
 	//test 3-2 Compare Date (No Pass) BusinessException INVALID_DATE
 	@Test
 	void checkDate_WillCallRefundTxn_DateNotEqualNoPass(){
 		//arrange
-		refundTxn.setProcessDate("20230115");
+		refundTxn.setProcessDate("20230116");
 		Optional<RefundTxn> refundTxnOptional= Optional.of(refundTxn);
 
 		Mockito.when(refundTxnRepository.getS061BySeqNoAndAdviceBranch(anyString(),anyString())).thenReturn(refundTxnOptional);
 		//act
 		//assert
 		var ex = Assertions.assertThrows(BusinessException.class, ()->{s061Service.checkDate(
-			updateS061RequestCommand);});
+			refundTxn.getProcessDate(),updateS061RequestCommand.getProcessDate());});
 
 		assertEquals("案件日期錯誤", ex.getMessage());
 		//Mockito.verify(refundTxnRepository).getS061BySeqNoAndAdviceBranch(anyString(),anyString());
 	}
 
-	//test 3-3 Compare Date (No Pass) BusinessException NO DATA
-	@Test
-	void checkDate_WillCallRefundTxn_NoDataNoPass(){
-		//arrange
-		refundTxn = null;
-		Optional<RefundTxn> refundTxnOptional= Optional.ofNullable(refundTxn);
-		Mockito.when(refundTxnRepository.getS061BySeqNoAndAdviceBranch(anyString(),anyString())).thenReturn(refundTxnOptional);
-		//act
-		//assert
-		var ex = Assertions.assertThrows(BusinessException.class, ()->{s061Service.checkDate(
-			updateS061RequestCommand);});
-
-		assertEquals("查無資料", ex.getMessage());
-		Mockito.verify(refundTxnRepository).getS061BySeqNoAndAdviceBranch(anyString(),anyString());
-
-	}
 
 	//test 4-1 compare reasonable Rate (Pass)
 	@Test

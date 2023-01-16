@@ -59,10 +59,9 @@ public class S061Service {
 		return true;
 	}
 
-	public boolean checkDate(UpdateS061RequestCommand updateS061RequestCommand){
+	public boolean checkDate(String refundTxnProcessDate,String commandProcessDate){
 
-		RefundTxn refundTxn= getRefundTxn(updateS061RequestCommand.getSeqNo(),updateS061RequestCommand.getAdviceBranch());
-		if(!updateS061RequestCommand.getProcessDate().equals(refundTxn.getProcessDate())){
+		if(!commandProcessDate.equals(refundTxnProcessDate)){
 			throw new BusinessException(ServiceStatusCode.INVALID_DATE.getCode(),ServiceStatusCode.INVALID_DATE.getMessage());
 		}
 
