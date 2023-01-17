@@ -41,13 +41,12 @@ public class S061Service {
 
 	public RefundTxn getRefundTxn(String seqNo, String adviceBranch){
 		Optional<RefundTxn> refundTxnOptional =  refundTxnRepository.getS061BySeqNoAndAdviceBranch(seqNo,adviceBranch);
-		RefundTxn refundTxn= null;
 		if(refundTxnOptional.isEmpty()){
 			throw new BusinessException(ServiceStatusCode.DATA_NOT_FOUND.getCode(),ServiceStatusCode.DATA_NOT_FOUND.getMessage());
 		}else{
 			refundTxn = refundTxnOptional.get();
+			return refundTxn;
 		}
-		return refundTxn;
 	}
 
 	public boolean checkVersion(String refundTxnVersion,String commandVersion){

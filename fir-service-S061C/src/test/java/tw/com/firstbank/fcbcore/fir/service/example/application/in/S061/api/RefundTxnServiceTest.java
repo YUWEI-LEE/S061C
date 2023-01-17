@@ -74,6 +74,42 @@ public class RefundTxnServiceTest {
 		refundTxn.setVersion("01");
 	}
 
+	//test 1-1 get s061service (Pass)
+	@Test
+	void getS061Info_WillQueryRefundTxn_getPass(){
+		//arrange
+		RefundTxn refundTxnExpect = new RefundTxn();
+		RefundTxn refundDB = new RefundTxn();
+		refundDB.setSeqNo("1234567");
+		refundDB.setAdviceBranch("091");
+		refundDB.setProcessDate("20230115");
+		refundDB.setCurrencyCode("USD");
+		refundDB.setVersion("01");
+		Optional<RefundTxn> refundTxnDBOptional= Optional.of(refundDB);
+		Mockito.when(refundTxnRepository.getS061BySeqNoAndAdviceBranch(anyString(),anyString())).thenReturn(refundTxnDBOptional);
+		//act
+		refundTxnExpect = s061Service.getRefundTxn(updateS061RequestCommand.getSeqNo(),updateS061RequestCommand.getAdviceBranch());
+		//assert
+		Assertions.assertEquals(refundTxn,refundTxnExpect);
+
+	}
+
+	//test 1-2 get s061service (Data Not Found)(No Pass)
+	@Test
+	void getS061Info_WillQueryRefundTxnDataNotFound_NoPass(){
+		//arrange
+		Optional<RefundTxn> refundTxnDBOptional= Optional.empty();
+		Mockito.when(refundTxnRepository.getS061BySeqNoAndAdviceBranch(anyString(),anyString())).thenReturn(refundTxnDBOptional);
+		//act
+		//assert
+		var ex = Assertions.assertThrows(BusinessException.class ,() -> {s061Service.getRefundTxn(
+			updateS061RequestCommand.getSeqNo(),updateS061RequestCommand.getAdviceBranch());} );
+
+		assertEquals("查無資料",ex.getMessage());
+		Mockito.verify(refundTxnRepository).getS061BySeqNoAndAdviceBranch(anyString(),anyString());
+
+	}
+
 	//test 2-1 Compare Version (Pass)
 	@Test
 	void checkVersion_WillCallRefundTxn_VersionEqualPass(){

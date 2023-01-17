@@ -7,13 +7,15 @@ import tw.com.firstbank.fcbcore.fir.service.example.application.in.S061.S061Serv
 import tw.com.firstbank.fcbcore.fir.service.example.application.in.S061.api.S061cUserCaseApi;
 import tw.com.firstbank.fcbcore.fir.service.example.application.in.S061.api.UpdateS061RequestCommand;
 import tw.com.firstbank.fcbcore.fir.service.example.application.in.S061.api.UpdateS061ResponseCommand;
+import tw.com.firstbank.fcbcore.fir.service.example.application.out.repository.RefundTxnRepository;
 import tw.com.firstbank.fcbcore.fir.service.example.domain.RefundTxn;
 
 @Service
 @AllArgsConstructor
-public class S061cUserCaseImpl extends S061cUserCaseApi implements CommandHandler {
+public class S061CUseCaseImpl extends S061cUserCaseApi implements CommandHandler {
 
 	private final S061Service s061Service;
+
 
 	//1.S061c get
 	//2.compare  version
@@ -37,8 +39,7 @@ public class S061cUserCaseImpl extends S061cUserCaseApi implements CommandHandle
 		requestCommand.getCoreHeader().setXCoreChannel(channel + "*");
 
 		//1.S061c get
-		RefundTxn refundTxn = new RefundTxn();
-		refundTxn = s061Service.getRefundTxn(requestCommand.getSeqNo(),requestCommand.getAdviceBranch());
+		RefundTxn refundTxn = s061Service.getRefundTxn(requestCommand.getSeqNo(),requestCommand.getAdviceBranch());
 
 		//2.compare  version
 		boolean isPass= s061Service.checkVersion(refundTxn.getVersion(),requestCommand.getVersion());
