@@ -14,6 +14,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import tw.com.firstbank.fcbcore.fcbframework.core.application.exception.ValidationException;
 import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.FxRateResponse;
+import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.MainFrameResponse;
 import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.MainframeService;
 import tw.com.firstbank.fcbcore.fir.service.example.application.in.S061.S061Service;
 import tw.com.firstbank.fcbcore.fir.service.example.application.in.S061.api.UpdateS061RequestCommand;
@@ -39,6 +40,8 @@ public class UpdateRefundTxnUserCaseImplTest {
 	private RefundTxn refundTxn;
 
 	private FxRateResponse fxRateResponse;
+
+	private MainFrameResponse mainFrameResponse;
 
 	@BeforeEach
 	void setUp() {
@@ -67,9 +70,12 @@ public class UpdateRefundTxnUserCaseImplTest {
 		fxRateResponse = new FxRateResponse();
 		fxRateResponse.setReturnCode("0000");
 
+		mainFrameResponse = new MainFrameResponse();
+		mainFrameResponse.setReturnCode("0000");
 
 		Mockito.when(refundTxnRepository.getS061BySeqNoAndAdviceBranch(anyString(), anyString())).thenReturn(refundTxnOptional);
 		Mockito.when(mainframeService.isReasonableFxRate(any())).thenReturn(fxRateResponse);
+		Mockito.when(mainframeService.mainframeIO(any())).thenReturn(mainFrameResponse);
 
 		//act
 		UpdateS061ResponseCommand responseCommand = s061CUseCase.execute(updateS061RequestCommand);

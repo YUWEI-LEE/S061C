@@ -20,6 +20,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import tw.com.firstbank.fcbcore.fcbframework.core.application.exception.BusinessException;
 import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.FxRateResponse;
+import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.MainFrameRequest;
 import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.MainFrameResponse;
 import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.MainframeService;
 import tw.com.firstbank.fcbcore.fir.service.example.application.exception.ServiceStatusCode;
@@ -66,7 +67,6 @@ public class RefundTxnServiceTest {
 		updateS061RequestCommand.setAdviceBranch("091");
 		updateS061RequestCommand.setSeqNo("1234567");
 		updateS061RequestCommand.setProcessDate("20230115");
-		updateS061RequestCommand.setCurrencyCode("USD");
 		refundTxn = new RefundTxn();
 		refundTxn.setSeqNo("1234567");
 		refundTxn.setAdviceBranch("091");
@@ -209,15 +209,12 @@ public class RefundTxnServiceTest {
 	@Test
 	void givenCurrencyCode_WillCallMainframeService_ToGetFxRatePass(){
 		//arrange
-		FxRateRequest request = new FxRateRequest();
-		request.setCurrencyCode(updateS061RequestCommand.getCurrencyCode());
-		request.setProcessDate(updateS061RequestCommand.getProcessDate());
 		FxRateResponse response = new FxRateResponse();
 		response.setToUsdRate(new BigDecimal(30.5));
 		response.setReturnCode("0000");
 		Mockito.when(mainframeService.getToUsdRate(any())).thenReturn(response);
 		//act
-		BigDecimal fxRate= s061Service.getToUsdRate(request);
+		BigDecimal fxRate= s061Service.getToUsdRate(updateS061RequestCommand);
 		//assert
 		Mockito.verify(mainframeService,atLeastOnce()).getToUsdRate(any());
 		Assertions.assertEquals(new BigDecimal(30.5), fxRate);
@@ -227,15 +224,12 @@ public class RefundTxnServiceTest {
 	@Test
 	void givenCurrencyCode_WillCallMainframeService_ToGetFxRateNoPass(){
 		//arrange
-		FxRateRequest request = new FxRateRequest();
-		request.setCurrencyCode(updateS061RequestCommand.getCurrencyCode());
-		request.setProcessDate(updateS061RequestCommand.getProcessDate());
 		FxRateResponse response = new FxRateResponse();
 		//response.setFxRate(new BigDecimal(30.5));
 		response.setReturnCode("0000");
 		Mockito.when(mainframeService.getToUsdRate(any())).thenReturn(response);
 		//act
-		BigDecimal fxRate= s061Service.getToUsdRate(request);
+		BigDecimal fxRate= s061Service.getToUsdRate(updateS061RequestCommand);
 		//assert
 		Mockito.verify(mainframeService,atLeastOnce()).getToUsdRate(any());
 		Assertions.assertEquals(null, fxRate);
@@ -253,8 +247,9 @@ public class RefundTxnServiceTest {
 		mainFrameResponse.setTxnNo(12345);
 		Mockito.when(mainframeService.mainframeIO(any())).thenReturn(mainFrameResponse);
 		//act
-
-		boolean isIOSuccess = s061Service.mainframeIO(updateS061RequestCommand);
+		MainFrameRequest mainFrameRequest = new MainFrameRequest();
+		mainFrameRequest.setData(updateS061RequestCommand.getSeqNo());
+		boolean isIOSuccess = s061Service.mainframeIO(mainFrameRequest);
 		//assert
 		Assertions.assertEquals(true,isIOSuccess);
 		Mockito.verify(mainframeService).mainframeIO(any());
@@ -269,7 +264,9 @@ public class RefundTxnServiceTest {
 		mainFrameResponse.setReturnCode("error");
 		Mockito.when(mainframeService.mainframeIO(any())).thenReturn(mainFrameResponse);
 		//act
-		boolean isIOSuccess = s061Service.mainframeIO(updateS061RequestCommand);
+		MainFrameRequest mainFrameRequest = new MainFrameRequest();
+		mainFrameRequest.setData(updateS061RequestCommand.getSeqNo());
+		boolean isIOSuccess = s061Service.mainframeIO(mainFrameRequest);
 		//assert
 		Assertions.assertEquals(false,isIOSuccess);
 		Mockito.verify(mainframeService,times(1)).mainframeIO(any());
