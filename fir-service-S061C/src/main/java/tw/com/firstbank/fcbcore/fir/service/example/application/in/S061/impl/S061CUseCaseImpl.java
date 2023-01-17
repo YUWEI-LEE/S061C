@@ -3,6 +3,7 @@ package tw.com.firstbank.fcbcore.fir.service.example.application.in.S061.impl;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import tw.com.firstbank.fcbcore.fcbframework.core.application.in.CommandHandler;
+import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.FxRateRequest;
 import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.MainFrameRequest;
 import tw.com.firstbank.fcbcore.fir.service.example.application.in.S061.S061Service;
 import tw.com.firstbank.fcbcore.fir.service.example.application.in.S061.api.S061cUserCaseApi;
@@ -38,6 +39,7 @@ public class S061CUseCaseImpl extends S061cUserCaseApi implements CommandHandler
 
 		String channel = requestCommand.getCoreHeader().getXCoreChannel();
 		requestCommand.getCoreHeader().setXCoreChannel(channel + "*");
+		FxRateRequest request = new FxRateRequest();
 
 		//1.S061c get
 		RefundTxn refundTxn = s061Service.getRefundTxn(requestCommand.getSeqNo(),requestCommand.getAdviceBranch());
@@ -52,7 +54,7 @@ public class S061CUseCaseImpl extends S061cUserCaseApi implements CommandHandler
 		boolean isReasonableRate = s061Service.checkReasonableFxRate(requestCommand.getSpotRate());
 
 		//5.update charge fee -> call FxRateService
-//		s061Service.getToUsdRate(requestCommand);
+		s061Service.getToUsdRate(request);
 
 		//6.compose form msg to mainframe  (FOSGLIF2、FOSTXLS1)
 		if(isVersion && isDate && isReasonableRate){

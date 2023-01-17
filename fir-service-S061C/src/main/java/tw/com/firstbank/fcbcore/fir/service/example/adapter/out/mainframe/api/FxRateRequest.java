@@ -12,4 +12,5 @@ public class FxRateRequest {
 
 	private BigDecimal fxRate;
 	private String currencyCode;
+	private String processDate;
 }

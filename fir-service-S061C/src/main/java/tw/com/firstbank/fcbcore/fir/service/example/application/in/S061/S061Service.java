@@ -83,9 +83,8 @@ public class S061Service {
 	}
 
 
-	public BigDecimal getToUsdRate(UpdateS061RequestCommand updateS061RequestCommand){
-		FxRateRequest fxRateRequest = new FxRateRequest();
-		fxRateRequest.setCurrencyCode(updateS061RequestCommand.getCurrencyCode());
+	public BigDecimal getToUsdRate(FxRateRequest fxRateRequest){
+
 		FxRateResponse fxRateResponse = mainframeService.getToUsdRate(fxRateRequest);
 		if (fxRateResponse.getReturnCode().equals(ServiceStatusCode.SUCCESS.getCode())){
 			return fxRateResponse.getToUsdRate();
@@ -101,10 +100,9 @@ public class S061Service {
 			refundTxn = new RefundTxn();
 			refundTxn.setTxnNo(mainFrameResponse.getTxnNo());
 			isPass = updateRefundTxn(refundTxn);
-			return isPass;
-		}else {
-			return isPass;
 		}
+
+		return isPass;
 	}
 
 	public boolean updateRefundTxn(RefundTxn refundTxn) throws Exception {
