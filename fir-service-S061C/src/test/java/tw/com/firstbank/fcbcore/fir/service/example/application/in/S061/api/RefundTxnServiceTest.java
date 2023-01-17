@@ -180,7 +180,7 @@ public class RefundTxnServiceTest {
 		fxRateResponse.setReturnCode("0000");
 		Mockito.when(mainframeService.isReasonableFxRate(any())).thenReturn(fxRateResponse);
 		//act
-		Boolean isPass= s061Service.checkReasonableFxRate(updateS061RequestCommand);
+		Boolean isPass= s061Service.checkReasonableFxRate(updateS061RequestCommand.getSpotRate());
 
 		//assert
 		Assertions.assertEquals(true,isPass);
@@ -197,7 +197,7 @@ public class RefundTxnServiceTest {
 		fxRateResponse.setReturnCode("ED85");
 		Mockito.when(mainframeService.isReasonableFxRate(any())).thenReturn(fxRateResponse);
 		//act
-		Boolean isPass= s061Service.checkReasonableFxRate(updateS061RequestCommand);
+		Boolean isPass= s061Service.checkReasonableFxRate(updateS061RequestCommand.getSpotRate());
 
 		//assert
 		Assertions.assertEquals(false,isPass);

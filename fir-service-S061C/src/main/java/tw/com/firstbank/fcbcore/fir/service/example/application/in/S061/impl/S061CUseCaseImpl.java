@@ -31,7 +31,7 @@ public class S061CUseCaseImpl extends S061cUserCaseApi implements CommandHandler
 	public UpdateS061ResponseCommand execute(UpdateS061RequestCommand requestCommand) {
 
 		UpdateS061ResponseCommand responseCommand = new UpdateS061ResponseCommand();
-
+		responseCommand.setReturnCode("0000");
 		String txId = requestCommand.getClientHeader().getTxId();
 		requestCommand.getClientHeader().setTxId(txId + "*");
 
@@ -42,9 +42,22 @@ public class S061CUseCaseImpl extends S061cUserCaseApi implements CommandHandler
 		RefundTxn refundTxn = s061Service.getRefundTxn(requestCommand.getSeqNo(),requestCommand.getAdviceBranch());
 
 		//2.compare  version
-		boolean isPass= s061Service.checkVersion(refundTxn.getVersion(),requestCommand.getVersion());
+		boolean isVersion= s061Service.checkVersion(refundTxn.getVersion(),requestCommand.getVersion());
 
-		return null;
+		//3.check date
+		boolean isDate = s061Service.checkDate(refundTxn.getProcessDate(),requestCommand.getProcessDate());
+
+		//4.compare reasonable Rate
+		boolean isReasonableRate = s061Service.checkReasonableFxRate(requestCommand.getSpotRate());
+
+		//5.update charge fee -> call FxRateService
+		s061Service.getToUsdRate(requestCommand);
+
+		if(isVersion && isDate && isReasonableRate){
+
+		}
+
+		return responseCommand;
 	}
 
 

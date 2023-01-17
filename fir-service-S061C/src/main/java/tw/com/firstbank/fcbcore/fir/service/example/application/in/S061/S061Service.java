@@ -7,6 +7,7 @@ import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import tw.com.firstbank.fcbcore.fcbframework.core.application.exception.BusinessException;
 import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.FxRateRequest;
@@ -67,10 +68,10 @@ public class S061Service {
 		return true;
 	}
 
-	public boolean checkReasonableFxRate(UpdateS061RequestCommand updateS061RequestCommand){
+	public boolean checkReasonableFxRate(BigDecimal spotRate){
 
 		FxRateRequest fxRateRequest = new FxRateRequest();
-		fxRateRequest.setFxRate(updateS061RequestCommand.getSpotRate());
+		fxRateRequest.setFxRate(spotRate);
 		FxRateResponse fxRateResponse = mainframeService.isReasonableFxRate(fxRateRequest);
 		if (fxRateResponse.getReturnCode().equals(ServiceStatusCode.SUCCESS.getCode())){
 			return true;
@@ -81,6 +82,17 @@ public class S061Service {
 		}
 	}
 
+
+	public BigDecimal getToUsdRate(UpdateS061RequestCommand updateS061RequestCommand){
+		FxRateRequest fxRateRequest = new FxRateRequest();
+		fxRateRequest.setCurrencyCode(updateS061RequestCommand.getCurrencyCode());
+		FxRateResponse fxRateResponse = mainframeService.getToUsdRate(fxRateRequest);
+		if (fxRateResponse.getReturnCode().equals(ServiceStatusCode.SUCCESS.getCode())){
+			return fxRateResponse.getToUsdRate();
+		}else {
+			return BigDecimal.ZERO;
+		}
+	}
 
 	public boolean mainframeIO(UpdateS061RequestCommand updateS061RequestCommand) throws Exception {
 		boolean isPass = false;
@@ -110,17 +122,6 @@ public class S061Service {
 		}
 
 		return isSaveSuccess;
-	}
-
-	public BigDecimal getToUsdRate(UpdateS061RequestCommand updateS061RequestCommand){
-		FxRateRequest fxRateRequest = new FxRateRequest();
-		fxRateRequest.setCurrencyCode(updateS061RequestCommand.getCurrencyCode());
-		FxRateResponse fxRateResponse = mainframeService.getToUsdRate(fxRateRequest);
-		if (fxRateResponse.getReturnCode().equals(ServiceStatusCode.SUCCESS.getCode())){
-			return fxRateResponse.getToUsdRate();
-		}else {
-			return BigDecimal.ZERO;
-		}
 	}
 
 	public S061Report print(){
