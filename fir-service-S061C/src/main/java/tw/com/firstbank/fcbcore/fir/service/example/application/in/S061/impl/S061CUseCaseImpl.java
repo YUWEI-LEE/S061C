@@ -1,10 +1,14 @@
 package tw.com.firstbank.fcbcore.fir.service.example.application.in.S061.impl;
 
+import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
+import org.bouncycastle.cert.ocsp.Req;
 import org.springframework.stereotype.Service;
 import tw.com.firstbank.fcbcore.fcbframework.core.application.in.CommandHandler;
 import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.FxRateRequest;
 import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.MainFrameRequest;
+import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.MainFrameResponse;
+import tw.com.firstbank.fcbcore.fir.service.example.application.exception.ServiceStatusCode;
 import tw.com.firstbank.fcbcore.fir.service.example.application.in.S061.S061Service;
 import tw.com.firstbank.fcbcore.fir.service.example.application.in.S061.api.S061cUserCaseApi;
 import tw.com.firstbank.fcbcore.fir.service.example.application.in.S061.api.UpdateS061RequestCommand;
@@ -39,7 +43,6 @@ public class S061CUseCaseImpl extends S061cUserCaseApi implements CommandHandler
 
 		String channel = requestCommand.getCoreHeader().getXCoreChannel();
 		requestCommand.getCoreHeader().setXCoreChannel(channel + "*");
-		FxRateRequest request = new FxRateRequest();
 
 		//1.S061c get
 		RefundTxn refundTxn = s061Service.getRefundTxn(requestCommand.getSeqNo(),requestCommand.getAdviceBranch());
@@ -53,22 +56,37 @@ public class S061CUseCaseImpl extends S061cUserCaseApi implements CommandHandler
 		//4.compare reasonable Rate
 		boolean isReasonableRate = s061Service.checkReasonableFxRate(requestCommand.getSpotRate());
 
+		FxRateRequest fxRateRequest = new FxRateRequest();
+		fxRateRequest.setCurrencyCode(requestCommand.getCurrencyCode());
+		fxRateRequest.setProcessDate(requestCommand.getProcessDate());
+		fxRateRequest.setFxRate(requestCommand.getSpotRate());
 		//5.update charge fee -> call FxRateService
-		s061Service.getToUsdRate(request);
+		s061Service.getToUsdRate(fxRateRequest);
 
 		//6.compose form msg to mainframe  (FOSGLIF2、FOSTXLS1)
+		//6.1 account no update (txn-no)
+		MainFrameResponse mainFrameResponse = new MainFrameResponse();
 		if(isVersion && isDate && isReasonableRate){
 			try {
 				MainFrameRequest mainFrameRequest = new MainFrameRequest();
 				mainFrameRequest.setData(requestCommand.getSeqNo());
-				s061Service.mainframeIO(mainFrameRequest);
+				mainFrameResponse = s061Service.mainframeIO(mainFrameRequest);
+				if (mainFrameResponse.getReturnCode().equals(ServiceStatusCode.SUCCESS.getCode())){
+					refundTxn.setTxnNo(mainFrameResponse.getTxnNo());
+				}
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
 		}
 
-		//6.1 account no update (txn-no)
+		//7.S061 update
+		try {
+			s061Service.updateRefundTxn(refundTxn);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 
+		//8.response body
 
 
 		return responseCommand;

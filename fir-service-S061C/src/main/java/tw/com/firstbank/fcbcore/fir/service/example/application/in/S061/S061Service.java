@@ -93,31 +93,20 @@ public class S061Service {
 		}
 	}
 
-	public boolean mainframeIO(MainFrameRequest mainFrameRequest) throws Exception {
-		boolean isPass = false;
+	public MainFrameResponse mainframeIO(MainFrameRequest mainFrameRequest) throws Exception {
 		MainFrameResponse mainFrameResponse = mainframeService.mainframeIO(mainFrameRequest);
-		if (mainFrameResponse.getReturnCode().equals(ServiceStatusCode.SUCCESS.getCode())){
-			refundTxn = new RefundTxn();
-			refundTxn.setTxnNo(mainFrameResponse.getTxnNo());
-			isPass = updateRefundTxn(refundTxn);
-		}
-
-		return isPass;
+		return mainFrameResponse;
 	}
 
-	public boolean updateRefundTxn(RefundTxn refundTxn) throws Exception {
-
-		boolean isSaveSuccess = false;
+	public void updateRefundTxn(RefundTxn refundTxn) throws Exception {
 		try{
 			RefundTxn refundTxnOutput = refundTxnRepository.save(refundTxn);
-			isSaveSuccess = true;
 		}catch (Exception ex){
 			log.error("儲存資料庫失敗",ex);
 			throw new RuntimeException("DataBaseError");
 
 		}
 
-		return isSaveSuccess;
 	}
 
 	public S061Report print(){

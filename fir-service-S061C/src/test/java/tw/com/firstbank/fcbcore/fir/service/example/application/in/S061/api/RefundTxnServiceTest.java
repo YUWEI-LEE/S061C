@@ -256,9 +256,9 @@ public class RefundTxnServiceTest {
 		//act
 		MainFrameRequest mainFrameRequest = new MainFrameRequest();
 		mainFrameRequest.setData(updateS061RequestCommand.getSeqNo());
-		boolean isIOSuccess = s061Service.mainframeIO(mainFrameRequest);
+		mainFrameResponse = s061Service.mainframeIO(mainFrameRequest);
 		//assert
-		Assertions.assertEquals(true,isIOSuccess);
+		Assertions.assertEquals("0000",mainFrameResponse.getReturnCode());
 		Mockito.verify(mainframeService).mainframeIO(any());
 	}
 
@@ -273,9 +273,9 @@ public class RefundTxnServiceTest {
 		//act
 		MainFrameRequest mainFrameRequest = new MainFrameRequest();
 		mainFrameRequest.setData(updateS061RequestCommand.getSeqNo());
-		boolean isIOSuccess = s061Service.mainframeIO(mainFrameRequest);
+		mainFrameResponse = s061Service.mainframeIO(mainFrameRequest);
 		//assert
-		Assertions.assertEquals(false,isIOSuccess);
+		Assertions.assertEquals("error",mainFrameResponse.getReturnCode());
 		Mockito.verify(mainframeService,times(1)).mainframeIO(any());
 	}
 
@@ -286,9 +286,8 @@ public class RefundTxnServiceTest {
 		refundTxn.setReturnReason("AC02");
 		Mockito.when(refundTxnRepository.save(any())).thenReturn(refundTxn);
 		//act
-		boolean isSaveSuccess = s061Service.updateRefundTxn(refundTxn);
+		s061Service.updateRefundTxn(refundTxn);
 		//assert
-		Assertions.assertEquals(true,isSaveSuccess);
 		Mockito.verify(refundTxnRepository).save(any());
 	}
 
