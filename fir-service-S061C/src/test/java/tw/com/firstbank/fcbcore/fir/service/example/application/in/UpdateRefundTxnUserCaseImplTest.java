@@ -47,7 +47,7 @@ public class UpdateRefundTxnUserCaseImplTest {
 	@BeforeEach
 	void setUp() {
 		openMocks(this);
-		s061Service = new S061Service(refundTxnRepository,mainframeService,refundTxn);
+		s061Service = new S061Service(refundTxnRepository,mainframeService);
 		s061CUseCase = new S061CUseCaseImpl(s061Service);
 		refundTxn = new RefundTxn();
 		refundTxn.setSeqNo("1234567");
@@ -89,7 +89,7 @@ public class UpdateRefundTxnUserCaseImplTest {
 
 	}
 
-	//Usecase S061C (No Pass)
+	//Usecase S061C RuntimeException (No Pass)
 	@Test
 	void updateS061_WhenS061CUpdateDB_NoPass() throws Exception {
 		//arrange

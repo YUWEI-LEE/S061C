@@ -37,10 +37,9 @@ public class S061Service {
 
 	private final MainframeService mainframeService;
 
-	private RefundTxn refundTxn;
-
 
 	public RefundTxn getRefundTxn(String seqNo, String adviceBranch){
+		RefundTxn refundTxn;
 		Optional<RefundTxn> refundTxnOptional =  refundTxnRepository.getS061BySeqNoAndAdviceBranch(seqNo,adviceBranch);
 		if(refundTxnOptional.isEmpty()){
 			throw new BusinessException(ServiceStatusCode.DATA_NOT_FOUND.getCode(),ServiceStatusCode.DATA_NOT_FOUND.getMessage());

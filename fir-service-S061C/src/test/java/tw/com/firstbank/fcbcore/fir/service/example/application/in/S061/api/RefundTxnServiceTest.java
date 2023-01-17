@@ -61,7 +61,7 @@ public class RefundTxnServiceTest {
 	@BeforeEach
 	public void setup() {
 		openMocks(this);
-		s061Service = new S061Service(refundTxnRepository,mainframeService,refundTxn);
+		s061Service = new S061Service(refundTxnRepository,mainframeService);
 		updateS061RequestCommand = new UpdateS061RequestCommand();
 		updateS061RequestCommand.setVersion("01");
 		updateS061RequestCommand.setAdviceBranch("091");
