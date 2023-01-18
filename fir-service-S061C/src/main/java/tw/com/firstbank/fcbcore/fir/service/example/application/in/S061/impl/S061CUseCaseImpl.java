@@ -15,6 +15,7 @@ import tw.com.firstbank.fcbcore.fir.service.example.application.in.S061.api.Upda
 import tw.com.firstbank.fcbcore.fir.service.example.application.in.S061.api.UpdateS061ResponseCommand;
 import tw.com.firstbank.fcbcore.fir.service.example.application.out.repository.RefundTxnRepository;
 import tw.com.firstbank.fcbcore.fir.service.example.domain.RefundTxn;
+import tw.com.firstbank.fcbcore.fir.service.example.domain.S061Report;
 
 @Service
 @AllArgsConstructor
@@ -87,7 +88,14 @@ public class S061CUseCaseImpl extends S061cUserCaseApi implements CommandHandler
 		}
 
 		//8.response body
+		S061Report s061Report = new S061Report();
 
+		try {
+			responseCommand.setReturnMessage(s061Report.toString());
+		} catch (Exception e) {
+			responseCommand.setReturnCode("9900");
+			responseCommand.setReturnMessage(e.toString());
+		}
 
 		return responseCommand;
 	}
