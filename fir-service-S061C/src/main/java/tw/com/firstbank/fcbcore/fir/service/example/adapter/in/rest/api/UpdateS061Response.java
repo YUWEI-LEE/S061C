@@ -4,16 +4,26 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import tw.com.firstbank.fcbcore.fcbframework.core.adapter.in.rest.api.ResponseBody;
 
+@Setter
+@ToString
 public class UpdateS061Response implements ResponseBody {
 
 	/**
 	 * The api List.
 	 */
-	@JsonProperty(value = "list")
-	List<S061DTO> list = new ArrayList<>();
+//	@JsonProperty(value = "list")
+//	List<S061DTO> list = new ArrayList<>();
 
+	@JsonProperty(value = "message")
+	private  String message;
+
+	@ToString
+	@Setter
 	public static class S061DTO{
 
 		@Schema(description = "UUID", example = "0136a826-82a4-493c-b0f2-de51b68ee4e4")

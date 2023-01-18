@@ -1,45 +1,53 @@
-package tw.com.firstbank.fcbcore.fir.service.example.adapter.in.rest;
+package tw.com.firstbank.fcbcore.fir.service.example;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
-import org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.cloud.openfeign.FeignAutoConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import tw.com.firstbank.fcbcore.fcbframework.core.application.in.CommandBus;
-import tw.com.firstbank.fcbcore.fcbframework.core.spring.config.CoreExceptionHandler;
+import org.springframework.web.context.WebApplicationContext;
 import tw.com.firstbank.fcbcore.fir.service.example.adapter.in.rest.api.UpdateS061Request;
-import tw.com.firstbank.fcbcore.fir.service.example.application.in.S061.api.UpdateS061RequestCommand;
-import tw.com.firstbank.fcbcore.fir.service.example.adapter.in.rest.impl.S061ControllerImpl;
+import tw.com.firstbank.fcbcore.fir.service.example.adapter.in.rest.api.UpdateS061Response;
+import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.FxRateResponse;
+import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.MainFrameResponse;
+import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.MainframeService;
 import tw.com.firstbank.fcbcore.fir.service.example.application.in.S061.api.UpdateS061ResponseCommand;
+import tw.com.firstbank.fcbcore.fir.service.example.application.out.repository.RefundTxnRepository;
+import tw.com.firstbank.fcbcore.fir.service.example.domain.RefundTxn;
 
-@WebMvcTest
+//@WebMvcTest
+@SpringBootTest(classes = ExampleServiceApplication.class)
 //@ImportAutoConfiguration({RabbitAutoConfiguration.class, FeignAutoConfiguration.class})
-public class RefundTxnControllerTest {
+@WebAppConfiguration
+public class RefundTxnIntegrationTest {
 
-	@Mock
-	private CommandBus commandBus;
+	@Autowired
+	private WebApplicationContext webApplicationContext;
 
 	@Autowired
 	private ObjectMapper objectMapper;
 
+	@MockBean
+	private RefundTxnRepository refundTxnRepository;
+	@MockBean
+	private MainframeService mainframeService;
 	private MockMvc mockMvc;
 	private HttpHeaders httpHeaders = new HttpHeaders();
 
@@ -54,10 +62,7 @@ public class RefundTxnControllerTest {
 		httpHeaders.add("Accept-Language", "zh-TW");
 		httpHeaders.add("Accept-Charset", "utf-8");
 
-		S061ControllerImpl s061ControllerImpl = new S061ControllerImpl(commandBus);
-		mockMvc = MockMvcBuilders.standaloneSetup(s061ControllerImpl)
-			.setControllerAdvice(CoreExceptionHandler.class)
-			.build();
+		mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 	}
 	@Test
 	void updateS061_WillUpdateS061_ReturnSuccess() throws Exception{
@@ -98,21 +103,41 @@ public class RefundTxnControllerTest {
 		updateS061ResponseCommand.setReturnCode("0000");
 		updateS061ResponseCommand.setReturnMessage("success");
 
-		//act
-		when(commandBus.handle(any())).thenReturn(updateS061ResponseCommand);
-		mockMvc.perform(post("/na/fir/ir/s061/update/v1")
+		//Repository response
+		RefundTxn refundTxn= new RefundTxn();
+		refundTxn.setSeqNo("1234567");
+		refundTxn.setAdviceBranch("091");
+		refundTxn.setVersion("01");
+		refundTxn.setProcessDate("20221201");
+		Optional<RefundTxn> refundTxnOptional = Optional.of(refundTxn);
+		FxRateResponse fxRateResponse= new FxRateResponse();
+		fxRateResponse.setReturnCode("0000");
+		fxRateResponse.setToUsdRate(new BigDecimal(1.2));
+		MainFrameResponse mainFrameResponse = new MainFrameResponse();
+		mainFrameResponse.setReturnCode("0000");
+		mainFrameResponse.setTxnNo(12345);
+
+
+		when(refundTxnRepository.getS061BySeqNoAndAdviceBranch(anyString(),anyString())).thenReturn(refundTxnOptional);
+		when(mainframeService.isReasonableFxRate(any())).thenReturn(fxRateResponse);
+		when(mainframeService.getToUsdRate(any())).thenReturn(fxRateResponse);
+		when(mainframeService.mainframeIO(any())).thenReturn(mainFrameResponse);
+
+		var result= mockMvc.perform(post("/na/fir/ir/s061/update/v1")
 				.headers(httpHeaders)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(requestJson)
 				.characterEncoding("utf-8")
 				.accept(MediaType.APPLICATION_JSON))
-			    .andExpect(status().isOk());
+			    .andExpect(status().isOk()).andReturn();
+
+
+		String contentString= result.getResponse().getContentAsString();
+		System.out.println(contentString);
 			// 驗證client Body
 //			.andExpect(jsonPath("$.clientResponse.returnCode").value(s061UpdateResponseCommand.getReturnCode()))
 //			.andExpect(jsonPath("$.clientResponse.returnMessage").value(s061UpdateResponseCommand.getReturnMessage()));
 
-		// validate
-		verify(commandBus).handle(any(UpdateS061RequestCommand.class));
 
 	}
 }

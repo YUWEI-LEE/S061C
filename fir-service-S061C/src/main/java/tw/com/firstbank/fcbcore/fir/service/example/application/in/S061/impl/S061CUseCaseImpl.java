@@ -88,10 +88,10 @@ public class S061CUseCaseImpl extends S061cUserCaseApi implements CommandHandler
 		}
 
 		//8.response body
-		S061Report s061Report = new S061Report();
+//		S061Report s061Report = new S061Report();
 
 		try {
-			responseCommand.setReturnMessage(s061Report.toString());
+			responseCommand.setReturnMessage(s061Service.print().toString());
 		} catch (Exception e) {
 			responseCommand.setReturnCode("9900");
 			responseCommand.setReturnMessage(e.toString());

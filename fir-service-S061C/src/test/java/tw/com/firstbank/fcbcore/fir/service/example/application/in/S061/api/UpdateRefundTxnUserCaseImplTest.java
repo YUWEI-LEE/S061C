@@ -1,4 +1,4 @@
-package tw.com.firstbank.fcbcore.fir.service.example.application.in;
+package tw.com.firstbank.fcbcore.fir.service.example.application.in.S061.api;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
