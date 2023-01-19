@@ -3,6 +3,9 @@ package tw.com.firstbank.fcbcore.fir.service.example.application.in.S061;
 import java.math.BigDecimal;
 import java.sql.SQLDataException;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
@@ -110,8 +113,11 @@ public class S061Service {
 
 	public S061Report print(){
 		S061Report s061Report = new S061Report();
+		Date date = new Date();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+		String sdate= dateFormat.format(date);
+		s061Report.setReportDate(sdate);
 		s061Report.setReportOperator("160474");
-		s061Report.setReportDate("20220116");
 
 		return s061Report;
 	}

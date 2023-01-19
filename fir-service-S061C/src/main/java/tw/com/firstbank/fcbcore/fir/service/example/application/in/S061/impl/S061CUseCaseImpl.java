@@ -1,6 +1,8 @@
 package tw.com.firstbank.fcbcore.fir.service.example.application.in.S061.impl;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import org.bouncycastle.cert.ocsp.Req;
 import org.springframework.stereotype.Service;
@@ -91,7 +93,10 @@ public class S061CUseCaseImpl extends S061cUserCaseApi implements CommandHandler
 //		S061Report s061Report = new S061Report();
 
 		try {
-			responseCommand.setReturnMessage(s061Service.print().toString());
+//			responseCommand.setReturnMessage(s061Service.print().toString());
+			List<S061Report> s061ReportList = new ArrayList<>() ;
+			s061ReportList.add(s061Service.print());
+			responseCommand.setS016ReportList(s061ReportList);
 		} catch (Exception e) {
 			responseCommand.setReturnCode("9900");
 			responseCommand.setReturnMessage(e.toString());

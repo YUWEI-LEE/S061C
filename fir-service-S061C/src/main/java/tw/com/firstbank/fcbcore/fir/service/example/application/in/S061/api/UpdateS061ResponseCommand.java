@@ -15,6 +15,7 @@ public class UpdateS061ResponseCommand implements ResponseCommand {
 
 	private String returnCode;
 	private String returnMessage;
+	private List<S061Report> s016ReportList;
 
 
 }

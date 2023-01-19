@@ -16,11 +16,15 @@ public class UpdateS061Response implements ResponseBody {
 	/**
 	 * The api List.
 	 */
-//	@JsonProperty(value = "list")
-//	List<S061DTO> list = new ArrayList<>();
 
-	@JsonProperty(value = "message")
-	private  String message;
+//	@JsonProperty(value = "message")
+//	private  String message;
+
+
+
+
+	@JsonProperty(value = "list")
+	List<S061DTO> list = new ArrayList<>();
 
 	@ToString
 	@Setter
@@ -49,7 +53,6 @@ public class UpdateS061Response implements ResponseBody {
 		@Schema(description = "操作員", example = "")
 		@JsonProperty(value = "operator")
 		private String operator;
-
 
 	}
 

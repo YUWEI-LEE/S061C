@@ -14,7 +14,8 @@ public interface S061ControllerMapper {
 
 	UpdateS061RequestCommand toUpdateS061RequestCommand(UpdateS061Request source);
 
-	@Mapping(source = "returnMessage", target = "message")
+//	@Mapping(source = "returnMessage", target = "message")
+    @Mapping(source = "s016ReportList", target = "list")
 	UpdateS061Response toUpdateS061Response(UpdateS061ResponseCommand source);
 
 }
