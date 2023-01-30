@@ -24,10 +24,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import tw.com.firstbank.fcbcore.fir.service.example.adapter.in.rest.api.UpdateS061Request;
-import tw.com.firstbank.fcbcore.fir.service.example.adapter.in.rest.api.UpdateS061Response;
 import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.FxRateResponse;
 import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.MainFrameResponse;
-import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.MainframeService;
+import tw.com.firstbank.fcbcore.fir.service.example.application.out.mainframe.api.MainframeServiceApi;
 import tw.com.firstbank.fcbcore.fir.service.example.application.in.S061.api.UpdateS061ResponseCommand;
 import tw.com.firstbank.fcbcore.fir.service.example.application.out.repository.RefundTxnRepository;
 import tw.com.firstbank.fcbcore.fir.service.example.domain.RefundTxn;
@@ -47,7 +46,7 @@ public class RefundTxnIntegrationTest {
 	@MockBean
 	private RefundTxnRepository refundTxnRepository;
 	@MockBean
-	private MainframeService mainframeService;
+	private MainframeServiceApi mainframeService;
 	private MockMvc mockMvc;
 	private HttpHeaders httpHeaders = new HttpHeaders();
 

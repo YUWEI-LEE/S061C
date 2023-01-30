@@ -25,7 +25,14 @@ public class RefundTxnRepositoryImpl implements RefundTxnRepository {
 	@Override
 	public Optional<RefundTxn> getS061BySeqNoAndAdviceBranch(String seqNo, String adviceBranch) {
 //		return repo.findBySeqNoAndAdviceBranch(seqNo,adviceBranch);
-		return Optional.empty();
+		RefundTxn refundTxn = new RefundTxn();
+		refundTxn = new RefundTxn();
+		refundTxn.setSeqNo("1234567");
+		refundTxn.setAdviceBranch("091");
+		refundTxn.setProcessDate("20221201");
+		refundTxn.setCurrencyCode("USD");
+		refundTxn.setVersion("01");
+		return Optional.of(refundTxn);
 	}
 
 	@Override

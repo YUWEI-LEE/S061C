@@ -22,13 +22,9 @@ import tw.com.firstbank.fcbcore.fcbframework.core.application.exception.Business
 import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.FxRateResponse;
 import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.MainFrameRequest;
 import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.MainFrameResponse;
-import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.MainframeService;
-import tw.com.firstbank.fcbcore.fir.service.example.application.exception.ServiceStatusCode;
+import tw.com.firstbank.fcbcore.fir.service.example.application.out.mainframe.api.MainframeServiceApi;
 import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.FxRateRequest;
-import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.FxRateResponse;
-import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.MainframeService;
 import tw.com.firstbank.fcbcore.fir.service.example.application.in.S061.S061Service;
-import tw.com.firstbank.fcbcore.fir.service.example.application.in.S061.mapper.RefundTxnDto;
 import tw.com.firstbank.fcbcore.fir.service.example.application.out.repository.RefundTxnRepository;
 import tw.com.firstbank.fcbcore.fir.service.example.domain.RefundTxn;
 import tw.com.firstbank.fcbcore.fir.service.example.domain.S061Report;
@@ -49,7 +45,7 @@ public class RefundTxnServiceTest {
 	private RefundTxnRepository refundTxnRepository;
 
 	@Mock
-	private MainframeService mainframeService;
+	private MainframeServiceApi mainframeService;
 
 	@Autowired
 	private S061Service s061Service;

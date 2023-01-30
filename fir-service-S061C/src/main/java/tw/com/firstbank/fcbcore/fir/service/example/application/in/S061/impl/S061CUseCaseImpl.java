@@ -1,10 +1,8 @@
 package tw.com.firstbank.fcbcore.fir.service.example.application.in.S061.impl;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
-import org.bouncycastle.cert.ocsp.Req;
 import org.springframework.stereotype.Service;
 import tw.com.firstbank.fcbcore.fcbframework.core.application.in.CommandHandler;
 import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.FxRateRequest;
@@ -12,16 +10,15 @@ import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.Ma
 import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.MainFrameResponse;
 import tw.com.firstbank.fcbcore.fir.service.example.application.exception.ServiceStatusCode;
 import tw.com.firstbank.fcbcore.fir.service.example.application.in.S061.S061Service;
-import tw.com.firstbank.fcbcore.fir.service.example.application.in.S061.api.S061cUserCaseApi;
+import tw.com.firstbank.fcbcore.fir.service.example.application.in.S061.api.S061cUseCaseApi;
 import tw.com.firstbank.fcbcore.fir.service.example.application.in.S061.api.UpdateS061RequestCommand;
 import tw.com.firstbank.fcbcore.fir.service.example.application.in.S061.api.UpdateS061ResponseCommand;
-import tw.com.firstbank.fcbcore.fir.service.example.application.out.repository.RefundTxnRepository;
 import tw.com.firstbank.fcbcore.fir.service.example.domain.RefundTxn;
 import tw.com.firstbank.fcbcore.fir.service.example.domain.S061Report;
 
 @Service
 @AllArgsConstructor
-public class S061CUseCaseImpl extends S061cUserCaseApi implements CommandHandler {
+public class S061CUseCaseImpl extends S061cUseCaseApi implements CommandHandler {
 
 	private final S061Service s061Service;
 

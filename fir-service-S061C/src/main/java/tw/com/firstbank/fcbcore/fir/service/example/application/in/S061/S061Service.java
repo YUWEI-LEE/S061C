@@ -1,29 +1,20 @@
 package tw.com.firstbank.fcbcore.fir.service.example.application.in.S061;
 
 import java.math.BigDecimal;
-import java.sql.SQLDataException;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import tw.com.firstbank.fcbcore.fcbframework.core.application.exception.BusinessException;
 import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.FxRateRequest;
 import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.FxRateResponse;
 import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.MainFrameRequest;
 import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.MainFrameResponse;
-import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.MainframeService;
-import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.MainframeService;
-import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.FxRateRequest;
-import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.api.FxRateResponse;
-import tw.com.firstbank.fcbcore.fir.service.example.adapter.out.mainframe.impl.MainframeServiceImpl;
+import tw.com.firstbank.fcbcore.fir.service.example.application.out.mainframe.api.MainframeServiceApi;
 import tw.com.firstbank.fcbcore.fir.service.example.application.exception.ServiceStatusCode;
-import tw.com.firstbank.fcbcore.fir.service.example.application.in.S061.api.UpdateS061RequestCommand;
 import tw.com.firstbank.fcbcore.fir.service.example.application.out.repository.RefundTxnRepository;
 import tw.com.firstbank.fcbcore.fir.service.example.domain.RefundTxn;
 import tw.com.firstbank.fcbcore.fir.service.example.domain.S061Report;
@@ -38,7 +29,7 @@ public class S061Service {
 
 	private final RefundTxnRepository refundTxnRepository;
 
-	private final MainframeService mainframeService;
+	private final MainframeServiceApi mainframeService;
 
 
 	public RefundTxn getRefundTxn(String seqNo, String adviceBranch){
